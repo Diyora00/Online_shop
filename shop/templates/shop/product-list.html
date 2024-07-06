@@ -1,0 +1,144 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}
+    Products list
+{% endblock %}
+    
+{% block product_content %}
+    <style>
+    .paging{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+    </style>
+        <div class="container mt-5">
+                <div class="text-left">
+                    {% if messages %}
+                                <ul class="messages">
+                                    {% for message in messages %}
+                                        <li style="color:green;font-size: larger" {% if message.tags %}
+                                            class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                                    {% endfor %}
+                                </ul>
+                          {% endif %}   
+                    <h3>Filter by</h3>
+                </div>
+                <div class="row">
+                    <div class="col-1">
+                        <a href="?order=expensive"><button style="background: #0dcaf0" class="btn btn-light" type="button">Expensive</button></a>
+                    </div>
+
+                    <div class="col-1">
+                        <a href="?order=cheap"><button style="background: #0dcaf0" class="btn btn-light" type="button">Cheap</button></a>
+                    </div>
+                    
+                    {% if user.is_authenticated %}
+                    <div class="col-1">
+                        <a href="{% url 'add_product' %}"><button type="button" style="background: #0dcaf0" class="btn btn-light">+ New</button></a>
+                    </div>
+                    {% endif %}
+                </div>
+            
+        </div>
+    <section class="py-5">
+            <div class="container px-4 px-lg-5 mt-5">
+                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                     {% for product in products %}
+                    <div class="col mb-5">
+                        <div class="card h-100">
+                            {% if product.discount > 0 %}
+                                <!-- Sale badge-->
+                            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
+                            {% endif %}
+                            <!-- Product image-->
+                            <img class="card-img-top" 
+                            src="{{ product.image.url }}" alt="..." />
+                            <!-- Product details-->
+                            <div class="card-body p-4">
+                                <div class="text-center">
+                                    <!-- Product name-->
+                                    <h5 class="fw-bolder">{{ product.name }}</h5>
+                                    <!-- Product price-->
+                                    {% if product.discount > 0 %}
+                                    {{ product.price }}$-{{ product.discount }}%<br>
+                                    Price: {{ product.discounted_price }}$
+                                    {% else %}
+                                        Price: {{ product.price |floatformat:2 }}$
+                                    {% endif %}
+                                    
+                                
+                                    <div class="d-flex justify-content-center small text-warning mb-2">
+                                     {% if product.rating == 1 %}
+                                         <div class="bi-star-fill"></div>
+                                     {% elif product.rating == 2 %}
+                                         <div class="bi-star-fill"></div>
+                                         <div class="bi-star-fill"></div>
+                                    {% elif product.rating == 3 %}
+                                        <div class="bi-star-fill"></div>
+                                        <div class="bi-star-fill"></div>
+                                        <div class="bi-star-fill"></div>
+                                    {% elif product.rating == 4 %} 
+                                         <div class="bi-star-fill"></div>
+                                         <div class="bi-star-fill"></div>
+                                         <div class="bi-star-fill"></div>
+                                         <div class="bi-star-fill"></div>
+                                    {% elif product.rating == 5 %}     
+                                         <div class="bi-star-fill"></div>
+                                         <div class="bi-star-fill"></div>
+                                         <div class="bi-star-fill"></div>
+                                         <div class="bi-star-fill"></div>
+                                         <div class="bi-star-fill"></div>
+                                    {% endif %}
+                                    </div>
+                                    
+                                
+                                </div>
+                            </div>
+                            <!-- Product actions-->
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'product_details' product.slug %}">View product</a></div>
+
+                        
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                
+                </div>
+            </div>
+    
+    <div class="paging">
+                <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li class="page-item">
+                {% if products.has_previous %}
+              <a class="page-link" href="?page={{ products.previous_page_number }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only"></span>
+              </a>
+                {% endif %}
+            </li>
+            <li class="page-item"><a class="page-link" href="?page={{ products.number }}">{{ products.number}}</a></li>
+          {% if products.number != products.next_page_number %}
+            <li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}">{{ products.next_page_number}}</a></li>
+                 <li class="page-item"><a class="page-link" href="#">...</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ products.paginator.num_pages }}">{{ products.paginator.num_pages  }}</a></li>
+            <li class="page-item">
+          {% endif %}
+{#            <li class="page-item"><a class="page-link" href="#">{{ products }}</a></li>#}
+           
+                {% if products.has_next %}
+              <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only"></span>
+              </a>
+                {% endif %}
+            </li>
+          </ul>
+        </nav>
+    </div>
+    
+    </section>
+{% endblock %}
