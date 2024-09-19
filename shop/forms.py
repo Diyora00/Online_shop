@@ -25,4 +25,3 @@ class AddProductForm(forms.ModelForm):
         model = Product
         exclude = ('slug', )
 
-

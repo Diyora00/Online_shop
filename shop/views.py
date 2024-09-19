@@ -18,14 +18,15 @@ def product_list(request, category_slug=None):
     p = Paginator(products, 4)
     page_number = request.GET.get('page', 1)
 
-    try:
-        products = p.get_page(page_number)  # returns the desired page object
-    except PageNotAnInteger:
-        # if page_number is not an integer then assign the first page
-        products = p.page(1)
-    except EmptyPage:
-        # if page is empty then return last page
-        products = p.page(p.num_pages)
+    if not search_post and not category_slug and not order:
+        try:
+            products = p.get_page(page_number)  # returns the desired page object
+        except PageNotAnInteger:
+            # if page_number is not an integer then assign the first page
+            products = p.page(1)
+        except EmptyPage:
+            # if page is empty then return last page
+            products = p.page(p.num_pages)
 
     if search_post:
         products = products.filter(Q(name__icontains=search_post) | Q(price__icontains=search_post))
@@ -80,6 +81,10 @@ def make_order(request, slug):
         order = Order(name=name, email=email, quantity=quantity, product_id=product.id)
         if form.is_valid():
             order.save()
+            product.quantity -= int(quantity)
+            print(product)
+            print(product.quantity)
+            print('order saved')
             messages.add_message(request, messages.SUCCESS, 'Order successfully added!.')
             return redirect('product_details', slug=slug)
     else:
