@@ -101,6 +101,7 @@ def add_comment(request, product_slug):
             comments = form.save(commit=False)
             comments.product = product
             comments.save()
+            print('saved successfully')
             messages.add_message(request, messages.SUCCESS, 'Your comment has been added.')
             return redirect('product_details', slug=product_slug)
     else:
